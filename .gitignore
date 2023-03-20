@@ -1,8 +1,0 @@
-# cache objects
-packer_cache/
-
-#crash log
-crash.log
-
-#for built boxes
-*.box
