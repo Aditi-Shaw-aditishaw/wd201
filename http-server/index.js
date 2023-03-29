@@ -1,60 +1,24 @@
-const form = document.getElementById("registrationForm");
-const table = document.getElementById("usersTable").getElementsByTagName('tbody')[0];
-const users = JSON.parse(localStorage.getItem('users')) || [];
+const express = require('express');
+const app = express();
+const path = require('path');
+const argv = require('minimist')(process.argv.slice(2));
 
-function displayUsers() {
-    table.innerHTML = "";
-    for (let user of users) {
-        const row = table.insertRow();
-        row.insertCell().textContent = user.name;
-        row.insertCell().textContent = user.email;
-        row.insertCell().textContent = user.password;
-        row.insertCell().textContent = user.dob;
-        row.insertCell().textContent = user.termsAccepted;
-    }
-}
+const port = argv.port || 3000;
 
-function addUser(event) {
-    event.preventDefault();
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const dob = document.getElementById("dob").value;
-    const termsAccepted = document.getElementById("terms").checked;
-    const age = calculateAge(dob);
+app.use(express.static(path.join(__dirname, 'public')));
 
-    if (!isValidEmail(email)) {
-        alert("Invalid email address.");
-        return;
-    }
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/home.html'));
+});
 
-    if (age < 18 || age > 55) {
-        alert("You must be between 18 and 55 years old to register.");
-        return;
-    }
+app.get('/projects', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/projects.html'));
+});
 
-    users.push({ name, email, password, dob, termsAccepted });
-    localStorage.setItem('users', JSON.stringify(users));
-    displayUsers();
-    form.reset();
-}
+app.get('/registration', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views/registration.html'));
+});
 
-function isValidEmail(email) {
-    const regex = /\S+@\S+\.\S+/;
-    return regex.test(email);
-}
-
-function calculateAge(dob) {
-    const today = new Date();
-    const birthDate = new Date(dob);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-    return age;
-}
-
-form.addEventListener("submit", addUser);
-
-displayUsers();
+app.listen(port, () => {
+  console.log(`Server started on port ${port}`);
+});
